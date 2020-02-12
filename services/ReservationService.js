@@ -42,6 +42,7 @@ class ReservationService {
         error: 'Our tables limit to 4 guests.',
       };
     }
+    //  else
     data.unshift({ datetime, numberOfGuests, customerName });
     await writeFile(this.datafile, JSON.stringify(data.sort((a, b) => b.datetime - a.datetime)));
     return {
