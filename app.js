@@ -6,8 +6,9 @@ const logger = require('morgan');
 const ReservationServce = require('./services/ReservationService');
 
 const indexRouter = require('./routes/index');
+const slackRouter = require('./routes/bots//slack');
 
-module.exports = (config) => {
+module.exports = config => {
   const app = express();
 
   const reservationService = new ReservationServce(config.reservations);
@@ -17,6 +18,8 @@ module.exports = (config) => {
   app.set('view engine', 'ejs');
 
   app.use(logger('dev'));
+  app.use('/bots/slack', slackRouter({ reservationService, config }));
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: false }));
   app.use(express.static(path.join(__dirname, 'public')));
