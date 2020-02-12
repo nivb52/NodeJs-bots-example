@@ -13,14 +13,14 @@ class ReservationService {
   }
 
   isAvailable(datetime, reservations) {
-    const x1 = datetime;
-    const x2 = datetime + this.reservationDuration;
+    const currResStart = datetime;
+    const currResEnd = datetime + this.reservationDuration;
 
-    // Find out if the intervals [x1, x2] and [y1, y2] overlap
+    // Find out if the intervals [currResStart, currResEnd] and [start, end] overlap
     const booked = reservations.filter((reservation) => {
-      const y1 = reservation.datetime;
-      const y2 = reservation.datetime + this.reservationDuration;
-      return x1 <= y2 && y1 <= x2;
+      const start = reservation.datetime;
+      const end = reservation.datetime + this.reservationDuration;
+      return currResStart <= end && start <= currResEnd;
     });
 
     return this.numberOfTables - booked.length >= 0;
@@ -32,9 +32,14 @@ class ReservationService {
 
   async tryReservation(datetime, numberOfGuests, customerName) {
     const data = await this.getData() || [];
-    if (numberOfGuests > 4 || !this.isAvailable(datetime, data)) {
+    if (!this.isAvailable(datetime, data)) {
       return {
         error: 'There are no free tables available at that time.',
+      };
+    }
+    if (numberOfGuests > 4) {
+      return {
+        error: 'Our tables limit to 4 guests.',
       };
     }
     data.unshift({ datetime, numberOfGuests, customerName });
